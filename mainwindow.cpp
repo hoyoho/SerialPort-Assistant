@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QMessageBox>
 #include <QValidator>
+#include <QDateTime>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),m_serial(new QSerialPort(this))
@@ -186,7 +187,12 @@ void MainWindow::fillPortsInfo()
 
 void MainWindow::readData()
 {
+    QDateTime current_date_time =QDateTime::currentDateTime();
+    QString current_date =current_date_time.toString("hh:mm:ss.zzz\t： ");
+
     const QByteArray data(m_serial->readAll());
+    ui->plainTextEditReceive->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
+    ui->plainTextEditReceive->insertPlainText(current_date);
     if(ui->radioButtonRecHex->isChecked())
     {
         std::string temp(data.toHex().toUpper().toStdString());
@@ -195,10 +201,10 @@ void MainWindow::readData()
         {
             toBeShow.append(*it++).append(*it).append(" ");
         }
-        ui->plainTextEditReceive->appendPlainText(toBeShow);
+        ui->plainTextEditReceive->insertPlainText(toBeShow + QString("\n"));
     }else
     {
-        ui->plainTextEditReceive->insertPlainText(data);
+        ui->plainTextEditReceive->insertPlainText(data + QByteArray("\n"));
     }
 }
 
